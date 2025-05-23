@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "transfer": "npx tsx src/token-transfer.ts",
-    "register": "npx tsx src/create-wrapped-token.ts"
+    "register": "npx tsx src/create-wrapped-token.ts",
+    "circle-auto-transfer": "npx tsx src/circle-auto-transfer.ts",
+    "circle-arb-solana": "npx tsx src/circle-arb-solana.ts"
   },
   "keywords": [],
   "author": "",
@@ -15,10 +17,17 @@
   "dependencies": {
     "@ethersproject/hardware-wallets": "^5.7.0",
     "@ledgerhq/hw-transport-webusb": "^6.29.4",
+    "@orca-so/common-sdk": "^0.6.11",
+    "@orca-so/sdk": "^1.2.26",
+    "@project-serum/anchor": "^0.26.0",
     "@solana/wallet-adapter-ledger": "^0.9.25",
     "@solana/wallet-adapter-react": "^0.15.35",
-    "@solana/web3.js": "^1.95.5",
-    "@wormhole-foundation/sdk": "^0.10.9",
+    "@solana/web3.js": "^1.98.2",
+    "@wormhole-foundation/sdk": "^1.20.0",
+    "@wormhole-foundation/sdk-definitions": "^1.20.0",
+    "@wormhole-foundation/sdk-evm-cctp": "^1.20.0",
+    "@wormhole-foundation/sdk-solana-cctp": "^1.20.0",
+    "cross-fetch": "^4.1.0",
     "dotenv": "^16.4.5",
     "ethers": "^6.13.4"
   },

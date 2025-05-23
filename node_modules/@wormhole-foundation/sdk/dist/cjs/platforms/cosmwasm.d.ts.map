@@ -1,0 +1,1 @@
+{"version":3,"file":"cosmwasm.d.ts","sourceRoot":"","sources":["../../../src/platforms/cosmwasm.ts"],"names":[],"mappings":"AACA,OAAO,KAAK,SAAS,MAAM,mCAAmC,CAAC;AAC/D,OAAO,KAAK,EAAE,kBAAkB,EAAE,MAAM,aAAa,CAAC;AACtD,QAAA,MAAM,QAAQ,EAAE,kBAAkB,CAAC,OAAO,SAAS,CAAC,SAAS,CAmB5D,CAAC;AACF,eAAe,QAAQ,CAAC"}
