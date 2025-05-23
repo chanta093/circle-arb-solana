@@ -158,8 +158,8 @@ const USDC_MINT = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v');
 			if (balance > 0) {
 				console.log('Converting token:', mint, 'balance:', balance);
 				// Jupiter APIを使用してトークン -> USDC スワップのクォートを取得
-				// slippageBps: 50 = 0.5%のスリッページ許容
-				const quoteResponse = await fetch(`${JUPITER_API_URL}/quote?inputMint=${mint}&outputMint=${USDC_MINT.toString()}&amount=${balance}&slippageBps=50`);
+				// slippageBps: 100 = 1%のスリッページ許容
+				const quoteResponse = await fetch(`${JUPITER_API_URL}/quote?inputMint=${mint}&outputMint=${USDC_MINT.toString()}&amount=${balance}&slippageBps=100`);
 				const quote = await quoteResponse.json();
 
 				if (quote) {
@@ -184,17 +184,21 @@ const USDC_MINT = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v');
 					// 3. ブロックハッシュを設定
 					// 4. 署名
 					// 5. 送信と確認
-					const latestBlockhash = await connection.getLatestBlockhash();
 					const swapTransaction = VersionedTransaction.deserialize(Buffer.from(swapResult.swapTransaction, 'base64'));
+					const latestBlockhash = await connection.getLatestBlockhash('finalized');
 					swapTransaction.message.recentBlockhash = latestBlockhash.blockhash;
 					const keypair = Keypair.fromSecretKey(bs58.decode(process.env.SOL_PRIVATE_KEY || ''));
 					swapTransaction.sign([keypair]);
-					const txid = await connection.sendTransaction(swapTransaction);
+					const txid = await connection.sendTransaction(swapTransaction, {
+						skipPreflight: false,
+						preflightCommitment: 'finalized',
+						maxRetries: 5
+					});
 					await connection.confirmTransaction({
 						signature: txid,
 						blockhash: latestBlockhash.blockhash,
 						lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
-					});
+					}, 'finalized');
 				}
 			}
 		}
@@ -213,8 +217,8 @@ const USDC_MINT = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v');
 		
 		// Jupiter APIを使用してSOL -> USDC スワップのクォートを取得
 		// So11...112はWrapped SOL（wSOL）のアドレス
-		// slippageBps: 50 = 0.5%のスリッページ許容
-		const quoteResponse = await fetch(`${JUPITER_API_URL}/quote?inputMint=So11111111111111111111111111111111111111112&outputMint=${USDC_MINT.toString()}&amount=${solToSwap}&slippageBps=50`);
+		// slippageBps: 100 = 1%のスリッページ許容
+		const quoteResponse = await fetch(`${JUPITER_API_URL}/quote?inputMint=So11111111111111111111111111111111111111112&outputMint=${USDC_MINT.toString()}&amount=${solToSwap}&slippageBps=100`);
 		const quote = await quoteResponse.json();
 
 		if (quote) {
@@ -239,17 +243,21 @@ const USDC_MINT = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v');
 			// 3. ブロックハッシュを設定
 			// 4. 署名
 			// 5. 送信と確認
-			const latestBlockhash = await connection.getLatestBlockhash();
 			const swapTransaction = VersionedTransaction.deserialize(Buffer.from(swapResult.swapTransaction, 'base64'));
+			const latestBlockhash = await connection.getLatestBlockhash('finalized');
 			swapTransaction.message.recentBlockhash = latestBlockhash.blockhash;
 			const keypair = Keypair.fromSecretKey(bs58.decode(process.env.SOL_PRIVATE_KEY || ''));
 			swapTransaction.sign([keypair]);
-			const txid = await connection.sendTransaction(swapTransaction);
+			const txid = await connection.sendTransaction(swapTransaction, {
+				skipPreflight: false,
+				preflightCommitment: 'finalized',
+				maxRetries: 5
+			});
 			await connection.confirmTransaction({
 				signature: txid,
 				blockhash: latestBlockhash.blockhash,
 				lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
-			});
+			}, 'finalized');
 		}
 	}
 
@@ -288,7 +296,7 @@ const USDC_MINT = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v');
 	const automatic = false; // 手動ブリッジモードを使用
 
 	// Circle CCTPブリッジのトランザクションを作成（USDCのみ対応）
-	const nativeGas = amount.units(amount.parse('0.0005', 18)); // Arbitrum側で必要なガス代（0.0005 ETH）
+	const nativeGas = amount.units(amount.parse('0.005', 18)); // Arbitrum側で必要なガス代（0.0005 ETH）
 	const xfer = await wh.circleTransfer(amt, source.address, destination.address, automatic, undefined, nativeGas);
 	console.log('Circle Transfer object created:', xfer);
 
